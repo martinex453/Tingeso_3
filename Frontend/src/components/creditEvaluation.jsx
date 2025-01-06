@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, TextField, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import loanService from "../services/loan.service";
+import userService from "../services/user.service";
 
 
 const CreditEvaluation = () => {
@@ -48,6 +49,24 @@ const CreditEvaluation = () => {
         }
     };
 
+    const formatNumber = (value) => {
+        if (!value) return "";
+        const number = Number(value.replace(/\D/g, "")); // Elimina caracteres no numéricos
+        return number.toLocaleString("es-CL"); // Formato chileno, ajustable según el país
+    };
+    
+    const handleIncomeChange = (e) => {
+        const rawValue = e.target.value;
+        const formattedValue = formatNumber(rawValue);
+        setIncome(formattedValue); // Actualizamos el estado con el valor formateado
+    };
+    
+    const handleBalanceChange = (e) => {
+        const rawValue = e.target.value;
+        const formattedValue = formatNumber(rawValue);
+        setBalance(formattedValue); // Actualizamos el estado con el valor formateado
+    };
+
     const handleDocumentSubmit = async (value) => {
         setDocuments(value);
         const loan = await upLoan(loanId);
@@ -62,24 +81,50 @@ const CreditEvaluation = () => {
     const handleEvaluationSubmit = async (event) => {
         event.preventDefault();
         console.log("Entrando a handleEvaluationSubmit");
-        if(!income || !creditHistory || !workEstability || !balance || !consistentSaving || !periodicSaving || !savingYears || !recentRetirement) {
+    
+        // Verificar que todos los campos estén completos
+        if (!income || !creditHistory || !workEstability || !balance || !consistentSaving || !periodicSaving || !savingYears || !recentRetirement) {
             alert("Rellene todos los campos");
             return;
         }
-
+    
+        // Eliminar comas y puntos como separadores de miles, luego convertir a números flotantes
+        const income_aux = income ? parseFloat(income.replace(/[.,]/g, '')) : 0;
+        const balance_aux = balance ? parseFloat(balance.replace(/[.,]/g, '')) : 0;
+    
+        // Verificar que el parseo haya sido exitoso
+        console.log("Luego de los parseFloat");
+        console.log(income_aux);  // Esto debe mostrar el valor numérico
+        console.log(balance_aux);  // Esto debe mostrar el valor numérico
+    
+        // Proceder con el cálculo y la lógica
         const loan = await upLoan(loanId);
         const maxCapital = await loanService.maxCapital(loanId);
-        const incomeQuota = await loanService.incomeQuota(income, loanId);
-        const debtBalance = await loanService.debtIncome(loan.userId, income);
-
-        const ageLimit = await loanService.ageLimit(loan.userId);
+        const incomeQuota = await loanService.incomeQuota(income_aux, loanId);
+        const debtBalance = await loanService.debtIncome(loan.userId, income_aux);
+    
+        const ageLimit = await userService.ageLimit(loan.userId);
         const isConsistentSaving = consistentSaving === "true";
         const isPeriodicSaving = periodicSaving === "true";
         const isRecentRetirement = recentRetirement === "true";
         
-        const savingCapacity = await loanService.savingCapacity(Number(balance), loanId, isConsistentSaving, isPeriodicSaving, isRecentRetirement, Number(savingYears), Number(loanAmount));
+        const balance_aux2 = Number(balance_aux);
+        const savingYears_aux = Number(savingYears);
+        const loanAmount_aux = Number(loanAmount);
+
+        console.log(typeof balance_aux2);
+        console.log(typeof savingYears_aux);
+        console.log(typeof loanAmount_aux);
+        console.log(typeof isConsistentSaving);
+        console.log(typeof isPeriodicSaving);
+        console.log(typeof isRecentRetirement);
+        console.log(typeof loan.id);
+
+        const savingCapacity = await loanService.savingCapacity(balance_aux2, loan.id, isConsistentSaving, isPeriodicSaving, isRecentRetirement, savingYears_aux, loanAmount_aux);
         
         console.log("Cargo todo");
+    
+        // Condicionales basadas en los resultados
         if (
             incomeQuota.data &&
             debtBalance.data &&
@@ -93,7 +138,7 @@ const CreditEvaluation = () => {
             let newState = 4;
             setState(newState);
             await loanService.updateState(loan, newState);
-        } else if(
+        } else if (
             incomeQuota.data &&
             debtBalance.data &&
             maxCapital.data &&
@@ -101,12 +146,11 @@ const CreditEvaluation = () => {
             ageLimit &&
             creditHistory == 1 &&
             workEstability == 1
-        ){
+        ) {
             console.log("Se cumplen parcialmente las condiciones");
             let newState = 2;
             setState(newState);
             await loanService.updateState(loan, newState);
-
         } else {
             console.log("No se cumplen las condiciones");
             let newState = 7;
@@ -114,6 +158,7 @@ const CreditEvaluation = () => {
             await loanService.updateState(loan, newState);
         }
     };
+    
 
     const handleDowloadDocuments = async (event) => {
         event.preventDefault();
@@ -189,9 +234,9 @@ const CreditEvaluation = () => {
                             <TextField
                                 id="income"
                                 label="Ingreso Cliente"
-                                type="number"
                                 value={income}
-                                onChange={(e) => setIncome(e.target.value)}
+                                onChange={handleIncomeChange}
+                                fullWidth
                             />
                         </FormControl>
                         <br/>
@@ -224,10 +269,10 @@ const CreditEvaluation = () => {
                         <FormControl fullWidth sx={{width: '70vw'}}>
                             <TextField
                                 id="balance"
-                                label="Saldo cliente"
-                                type="number"
+                                label="Saldo Cliente"
                                 value={balance}
-                                onChange={(e) => setBalance(e.target.value)}
+                                onChange={handleBalanceChange}
+                                fullWidth
                             />
                         </FormControl>
                         <br/>
@@ -263,7 +308,11 @@ const CreditEvaluation = () => {
                                 label="Años de ahorro"
                                 type="number"
                                 value={savingYears}
-                                onChange={(e) => setSavingYears(e.target.value)}
+                                onChange={(e) => {
+                                    const rawValue = e.target.value;
+                                    const validValue = rawValue.match(/^\d+$/) ? rawValue : rawValue.replace(/\D/g, '');
+                                    setSavingYears(validValue);
+                                }}
                             />
                         </FormControl>
                         <br/>

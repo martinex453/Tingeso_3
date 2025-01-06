@@ -258,7 +258,12 @@ const ApplyForLoan = () => {
                     label="Interés en porcentaje"
                     type="number"
                     value={interest}
-                    onChange={(e) => setInterest(e.target.value)}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "" || (Number(value) >= 0)) {
+                            setInterest(value);
+                        }
+                    }}
                     helperText={`Ejemplo: 3% - Rango: ${interestRange}`}
                 />
             </FormControl>

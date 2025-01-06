@@ -51,8 +51,8 @@ const LoanDetails = () => {
                             <TableCell>{handleType(loan.loantype) || 'N/A'}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell>Capital Solicitado:</TableCell>
-                            <TableCell>{loan.capital || 'N/A'} clp</TableCell>
+                        <TableCell>Capital Solicitado:</TableCell>
+                            <TableCell>{loan.capital ? loan.capital.toLocaleString() : 'N/A'} clp</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>Plazo del Crédito:</TableCell>
@@ -64,12 +64,13 @@ const LoanDetails = () => {
                         </TableRow>
                         <TableRow>
                             <TableCell>Cuota Mensual:</TableCell>
-                            <TableCell>{loan.monthQuote || 'N/A'} clp</TableCell>
+                            <TableCell>{loan.monthQuote ? loan.monthQuote.toLocaleString() : 'N/A'} clp</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>Total del Crédito:</TableCell>
-                            <TableCell>{loan.total || 'N/A'} clp</TableCell>
+                            <TableCell>{loan.total ? loan.total.toLocaleString() : 'N/A'} clp</TableCell>
                         </TableRow>
+
                     </TableBody>
                 </Table>
             </TableContainer>

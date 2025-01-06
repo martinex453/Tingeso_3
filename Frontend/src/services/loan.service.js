@@ -54,7 +54,7 @@ const debtIncome = async (userId, income) => {
 }
 
 const savingCapacity = (balance, loanId, consistentSaving, periodicSavings, recentRetirement, savingYears, loanAmount) => {
-    return httpClient.post(`/api/creditEvaluation/savingCapacity`, null, {
+    return httpClient.post(`/api/loan/savingCapacity`, null, {
         params: {
             balance,
             loanId,

@@ -109,6 +109,7 @@ public class LoanController {
                                                   @RequestParam Boolean recentRetirement,
                                                   @RequestParam Integer savingYears,
                                                   @RequestParam Double loanAmount){
+
         Integer result = loanService.savingCapacity(balance, loanId, consistentSaving, periodicSavings, recentRetirement, savingYears, loanAmount);
         return ResponseEntity.ok(result);
     }
