@@ -3,37 +3,37 @@ version: "3.8"
 services:
   #frontend services
   frontend1:
-    image: martinex453/front-martin-gamboa:latest
+    image: martinex453/front-final:latest
     networks:
       - frontend-network
   
   frontend2:
-    image: martinex453/front-martin-gamboa:latest
+    image: martinex453/front-final:latest
     networks:
       - frontend-network
 
   frontend3:
-    image: martinex453/front-martin-gamboa:latest
+    image: martinex453/front-final:latest
     networks:
       - frontend-network
 
   #backend services
   backend1:
-    image: martinex453/backend-martin-gamboa:latest
+    image: martinex453/backend-final:latest
     environment:
       - DB_HOST=4.228.225.18
     networks:
       - backend-network
   
   backend2:
-    image: martinex453/backend-martin-gamboa:latest
+    image: martinex453/backend-final:latest
     environment:
       - DB_HOST=4.228.225.18
     networks:
       - backend-network
 
   backend3:
-    image: martinex453/backend-martin-gamboa:latest
+    image: martinex453/backend-final:latest
     environment:
       - DB_HOST=4.228.225.18
     networks:
