@@ -60,14 +60,33 @@ const Register = () => {
             rut
         };
 
-        userService.create(user)
-            .then((response) => {
-                console.log("User created successfully!", response.data);
-                navigate("/login");
-            })
-            .catch((e) => {
-                console.log("There was an error registering the user!", e);
-            });
+        const confirmationMessage = `
+            ¿Está seguro de que desea registrar los siguientes datos?
+            
+            Nombre: ${name}
+            RUT: ${rut}
+            Correo: ${email}
+            Teléfono: ${phone}
+            Dirección: ${address}
+        `;
+        
+        // Mostrar el cuadro de confirmación
+        if (window.confirm(confirmationMessage)) {
+            // Si el usuario acepta, enviar los datos al backend
+            userService.create(user)
+                .then((response) => {
+                    console.log("Usuario creado exitosamente!", response.data);
+                    alert("Usuario registrado exitosamente");
+                    navigate("/login");
+                })
+                .catch((e) => {
+                    alert("Error al registrar el usuario", e);
+                    console.log("Hubo un error al registrar el usuario", e);
+                });
+        } else {
+            // Si el usuario cancela, no hacer nada
+            console.log("Registro cancelado");
+        }
     };
 
     return (

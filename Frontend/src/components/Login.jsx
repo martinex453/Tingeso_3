@@ -11,7 +11,7 @@ const Login = () => {
     const userLog = async (e) => {
         e.preventDefault();
         if (!email || !password) {
-            console.log("Email and password are required!");
+            alert("Rellene todos los campos");
             return;
         }
         const user = {
@@ -26,6 +26,7 @@ const Login = () => {
                 const userType = await userService.getId(response.data);
                 localStorage.setItem("usertype", userType.data.usertype);
                 localStorage.setItem("user", JSON.stringify(response.data));
+                alert("Inicio de sesión exitoso");
                 navigate("/home");
             }
             else{

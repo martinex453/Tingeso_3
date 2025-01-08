@@ -34,9 +34,11 @@ const LoanDetails = () => {
         try {
             await loanService.updateState(loan, 5);
             console.log("Estado actualizado correctamente.");
+            alert("Terminos aceptados correctamente.");
             Navigate("/myLoans");
         } catch (e) {
             console.log("Error updating loan state", e);
+            alert("Error al aceptar los términos y condiciones. Por favor, inténtelo de nuevo más tarde.");
         }
     };
 

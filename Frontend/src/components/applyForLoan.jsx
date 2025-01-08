@@ -34,15 +34,18 @@ const ApplyForLoan = () => {
         return `${value.slice(0, 2)}.${value.slice(2, 5)}.${value.slice(5, 8)}-${value.slice(8, 9)}`;
       };
     
-      const handleRutChange = (e) => {
+    const handleRutChange = (e) => {
         let value = e.target.value;
-
+    
+        // Eliminar los puntos y el guion si se vuelve a escribir
         value = value.replace(/\./g, "").replace("-", "");
-
+    
+        // Solo permitir números y el carácter "K" o "k"
         if (/^\d+$/.test(value) || /^[0-9Kk]*$/.test(value)) {
-          setRut(formatRut(value));
+            // Formatear el RUT con el guion al final
+            setRut(formatRut(value));
         }
-      };
+    };
 
     const formatNumberWithCommas = (number) => {
         number = number.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -104,81 +107,134 @@ const ApplyForLoan = () => {
         // Desformateo los números antes de enviarlos
         const unformattedCapital = capital.replace(/\./g, '');
         const unformattedPropCost = propCost.replace(/\./g, '');
-    
-        if (!unformattedCapital || !term || !loantype || !interest || !unformattedPropCost) {
-            alert("All fields are required!");
-        }
-    
-        const user = await userService.getId(userId);
-        if(user.data.rut !== rut){
-            alert("El rut ingresado no coincide con el rut del usuario");
+        
+        const unformattedRut = rut.replace(/\./g, '').replace(/[^0-9Kk-]/g, "");
+        console.log(unformattedRut);
+        if (!unformattedCapital || !term || !loantype || !interest || !unformattedPropCost || !unformattedRut) {
+            alert("Rellene todos los campos");
             return;
         }
-    
+
         switch (loantype) {
             case "1":
-                if (interest > 5 || interest < 3.5) {
-                    alert("El interes debe estar entre 3.5 y 5");
+                if(docIngresos === "" || docAvaluo === "" || docHistorialCrediticio === "" || docEscrituraPrimeraVivienda === ""){
+                    alert("Debe adjuntar todos los documentos requeridos, de lo contrario, la solicitud podria ser rechazada");
+                    return;
                 }
                 break;
             case "2":
-                if (interest > 6 || interest < 4) {
-                    alert("El interés debe estar entre 4 y 6");
+                if(docIngresos === "" || docAvaluo === "" || docHistorialCrediticio === "" || docEscrituraPrimeraVivienda === "" || docEstadoFinanciero === "" || docPlanNegocios === ""){
+                    alert("Debe adjuntar todos los documentos requeridos, de lo contrario, la solicitud podria ser rechazada");
+                    return;
                 }
                 break;
             case "3":
-                if (interest > 7 || interest < 5) {
-                    alert("El interés debe estar entre 5 y 7");
+                if(docIngresos === "" || docAvaluo === "" || docHistorialCrediticio === "" || docEstadoFinanciero === "" || docPlanNegocios === ""){
+                    alert("Debe adjuntar todos los documentos requeridos, de lo contrario, la solicitud podria ser rechazada");
+                    return;
                 }
                 break;
             case "4":
-                if (interest > 6 || interest < 4.5) {
-                    alert("El interés debe estar entre 4.5 y 6");
+                if(docIngresos === "" || docAvaluo === "" || docHistorialCrediticio === "" || docEstadoFinanciero === "" || docPlanNegocios === "" || docPresupuestoRemodelacion === ""){
+                    alert("Debe adjuntar todos los documentos requeridos, de lo contrario, la solicitud podria ser rechazada");
+                    return;
                 }
                 break;
+        }   
+
+        
+        let loanTypeName = "";
+        console.log(loantype);
+        switch (loantype) {
+            case "1":
+                loanTypeName = "Primera vivienda"; 
+                break; // Se agregó el break aquí
+            case "2":   
+                loanTypeName = "Segunda vivienda";
+                break; // Se agregó el break aquí
+            case "3":
+                loanTypeName = "Propiedades comerciales";
+                break; // Se agregó el break aquí
+            case "4":
+                loanTypeName = "Remodelación";
+                break; // Se agregó el break aquí
         }
-    
-        const loan = {
-            capital: unformattedCapital,
-            term,
-            loantype,
-            interest,
-            status,
-            monthfee,
-            propCost: unformattedPropCost,
-            userId,
-        };
-    
-        try {
-            const documents = [
-                { file: docIngresos, name: "Comprobante de ingresos" },
-                { file: docAvaluo, name: "Certificado de avalúo" },
-                { file: docHistorialCrediticio, name: "Historial crediticio" },
-                { file: docEscrituraPrimeraVivienda, name: "Escritura Primera Vivienda" },
-                { file: docEstadoFinanciero, name: "Estado Financiero" },
-                { file: docPlanNegocios, name: "Plan de Negocios" },
-                { file: docPresupuestoRemodelacion, name: "Presupuesto de Remodelación" },
-            ];
-    
-            const loanResponse = await loanService.create(loan);
-            console.log("Loan applied successfully!", loanResponse.data);
-    
-            for (const doc of documents) {
-                if (doc.file) {
-                    const formData = {
-                        loanId: loanResponse.data.id,
-                        file: doc.file,
-                        name: doc.name,
-                    };
-                    console.log("Uploading document:", doc.name);
-                    await documentService.uploadDocument(formData, userId);
-                }
+
+        const applyloanMessage = `¿Está seguro de que desea solicitar el siguiente crédito? 
+        \n\nRut: ${rut}\nCosto de Propiedad: ${propCost}\nCapital: ${unformattedCapital}\nPlazo: ${term} años\nInterés: ${interest}%\nTipo de crédito: ${loanTypeName}`;
+
+        if(window.confirm(applyloanMessage)){
+            const user = await userService.getId(userId);
+            if(user.data.rut !== unformattedRut){
+                alert("El rut ingresado no coincide con el rut del usuario");
+                return;
             }
-    
-            alert("Tu solicitud ha sido enviada exitosamente.");
-            navigate("/home");
-        } catch (e) {
-            console.log("There was an error applying for the loan or uploading documents!", e);
+        
+            switch (loantype) {
+                case "1":
+                    if (interest > 5 || interest < 3.5) {
+                        alert("El interes debe estar entre 3.5 y 5");
+                    }
+                    break;
+                case "2":
+                    if (interest > 6 || interest < 4) {
+                        alert("El interés debe estar entre 4 y 6");
+                    }
+                    break;
+                case "3":
+                    if (interest > 7 || interest < 5) {
+                        alert("El interés debe estar entre 5 y 7");
+                    }
+                    break;
+                case "4":
+                    if (interest > 6 || interest < 4.5) {
+                        alert("El interés debe estar entre 4.5 y 6");
+                    }
+                    break;
+            }
+        
+            const loan = {
+                capital: unformattedCapital,
+                term,
+                loantype,
+                interest,
+                status,
+                monthfee,
+                propCost: unformattedPropCost,
+                userId,
+            };
+        
+            try {
+                const documents = [
+                    { file: docIngresos, name: "Comprobante de ingresos" },
+                    { file: docAvaluo, name: "Certificado de avalúo" },
+                    { file: docHistorialCrediticio, name: "Historial crediticio" },
+                    { file: docEscrituraPrimeraVivienda, name: "Escritura Primera Vivienda" },
+                    { file: docEstadoFinanciero, name: "Estado Financiero" },
+                    { file: docPlanNegocios, name: "Plan de Negocios" },
+                    { file: docPresupuestoRemodelacion, name: "Presupuesto de Remodelación" },
+                ];
+        
+                const loanResponse = await loanService.create(loan);
+                console.log("Loan applied successfully!", loanResponse.data);
+        
+                for (const doc of documents) {
+                    if (doc.file) {
+                        const formData = {
+                            loanId: loanResponse.data.id,
+                            file: doc.file,
+                            name: doc.name,
+                        };
+                        console.log("Uploading document:", doc.name);
+                        await documentService.uploadDocument(formData, userId);
+                    }
+                }
+        
+                alert("Tu solicitud ha sido enviada exitosamente.");
+                navigate("/home");
+            } catch (e) {
+                console.log("There was an error applying for the loan or uploading documents!", e);
+            }
         }
     };
     

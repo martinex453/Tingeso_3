@@ -20,6 +20,16 @@ export default function Sidemenu({ open, toggleDrawer }) {
 
   const [userType, setUserType] = useState(localStorage.getItem("usertype"));
   
+  const handleLogout = () => {
+    const isConfirmed = window.confirm("¿Estás seguro de que quieres salir?");
+    if (isConfirmed) {
+      // Aquí puedes agregar cualquier lógica adicional antes de salir, como limpiar el almacenamiento o el estado
+      localStorage.removeItem("usertype"); // Por ejemplo, limpiar el tipo de usuario
+      navigate("/"); // Redirigir al usuario a la página de inicio
+    }
+  };
+  
+
   const listOptions = () => (
     <Box
       role="presentation"
@@ -65,7 +75,7 @@ export default function Sidemenu({ open, toggleDrawer }) {
           </ListItemButton>
         )}
 
-        <ListItemButton onClick={() => navigate("/")}>
+        <ListItemButton onClick={() => handleLogout()}>
           <ListItemIcon>
             <LogoutIcon />
           </ListItemIcon>

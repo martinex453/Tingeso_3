@@ -68,6 +68,10 @@ const CreditEvaluation = () => {
     };
 
     const handleDocumentSubmit = async (value) => {
+        if (!value) {
+            alert("Seleccione una opción");
+            return;
+        }
         setDocuments(value);
         const loan = await upLoan(loanId);
         if (loan) {
@@ -76,6 +80,7 @@ const CreditEvaluation = () => {
             setState(newState);
             await loanService.updateState(loan, newState);
         }
+        alert("Confirmacion de documentos actualizada");
     };
 
     const handleEvaluationSubmit = async (event) => {
@@ -87,75 +92,87 @@ const CreditEvaluation = () => {
             alert("Rellene todos los campos");
             return;
         }
-    
-        // Eliminar comas y puntos como separadores de miles, luego convertir a números flotantes
-        const income_aux = income ? parseFloat(income.replace(/[.,]/g, '')) : 0;
-        const balance_aux = balance ? parseFloat(balance.replace(/[.,]/g, '')) : 0;
-    
-        // Verificar que el parseo haya sido exitoso
-        console.log("Luego de los parseFloat");
-        console.log(income_aux);  // Esto debe mostrar el valor numérico
-        console.log(balance_aux);  // Esto debe mostrar el valor numérico
-    
-        // Proceder con el cálculo y la lógica
-        const loan = await upLoan(loanId);
-        const maxCapital = await loanService.maxCapital(loanId);
-        const incomeQuota = await loanService.incomeQuota(income_aux, loanId);
-        const debtBalance = await loanService.debtIncome(loan.userId, income_aux);
-    
-        const ageLimit = await userService.ageLimit(loan.userId);
-        const isConsistentSaving = consistentSaving === "true";
-        const isPeriodicSaving = periodicSaving === "true";
-        const isRecentRetirement = recentRetirement === "true";
-        
-        const balance_aux2 = Number(balance_aux);
-        const savingYears_aux = Number(savingYears);
-        const loanAmount_aux = Number(loanAmount);
 
-        console.log(typeof balance_aux2);
-        console.log(typeof savingYears_aux);
-        console.log(typeof loanAmount_aux);
-        console.log(typeof isConsistentSaving);
-        console.log(typeof isPeriodicSaving);
-        console.log(typeof isRecentRetirement);
-        console.log(typeof loan.id);
+        const histCredText = creditHistory === "1" ? "Normal" : "Existe Morosidad";
+        const workEstabilityText = workEstability === "1" ? "Estable" : "Inestable";
+        const consistentSavingText = consistentSaving === "true" ? "Consistente" : "Inconsistente";
+        const periodicSavingText = periodicSaving === "true" ? "Regular" : "Irregular";
+        const recentRetirementText = recentRetirement === "true" ? "Si" : "No";
 
-        const savingCapacity = await loanService.savingCapacity(balance_aux2, loan.id, isConsistentSaving, isPeriodicSaving, isRecentRetirement, savingYears_aux, loanAmount_aux);
+        const evaluationMessage = `¿Está seguro de que desea realizar la evaluación con los siguientes datos?
+        \n\nIngreso: ${income}\nHistorial crediticio: ${histCredText}\nEstabilidad laboral: ${workEstabilityText}\nSaldo: ${balance}\nAhorro consistente: ${consistentSavingText }\nDepositos periodicos: ${periodicSavingText}\nAños de ahorro: ${savingYears}\nRetiros importantes recientes: ${recentRetirementText}`;
+
+        if (window.confirm(evaluationMessage)) {
+            // Eliminar comas y puntos como separadores de miles, luego convertir a números flotantes
+            const income_aux = income ? parseFloat(income.replace(/[.,]/g, '')) : 0;
+            const balance_aux = balance ? parseFloat(balance.replace(/[.,]/g, '')) : 0;
         
-        console.log("Cargo todo");
-    
-        // Condicionales basadas en los resultados
-        if (
-            incomeQuota.data &&
-            debtBalance.data &&
-            maxCapital.data &&
-            savingCapacity.data == 1 &&
-            ageLimit &&
-            creditHistory == 1 &&
-            workEstability == 1
-        ) {
-            console.log("Se cumplen las condiciones");
-            let newState = 4;
-            setState(newState);
-            await loanService.updateState(loan, newState);
-        } else if (
-            incomeQuota.data &&
-            debtBalance.data &&
-            maxCapital.data &&
-            savingCapacity.data == 2 &&
-            ageLimit &&
-            creditHistory == 1 &&
-            workEstability == 1
-        ) {
-            console.log("Se cumplen parcialmente las condiciones");
-            let newState = 2;
-            setState(newState);
-            await loanService.updateState(loan, newState);
-        } else {
-            console.log("No se cumplen las condiciones");
-            let newState = 7;
-            setState(newState);
-            await loanService.updateState(loan, newState);
+            // Verificar que el parseo haya sido exitoso
+            console.log("Luego de los parseFloat");
+            console.log(income_aux);  // Esto debe mostrar el valor numérico
+            console.log(balance_aux);  // Esto debe mostrar el valor numérico
+        
+            // Proceder con el cálculo y la lógica
+            const loan = await upLoan(loanId);
+            const maxCapital = await loanService.maxCapital(loanId);
+            const incomeQuota = await loanService.incomeQuota(income_aux, loanId);
+            const debtBalance = await loanService.debtIncome(loan.userId, income_aux);
+        
+            const ageLimit = await userService.ageLimit(loan.userId);
+            const isConsistentSaving = consistentSaving === "true";
+            const isPeriodicSaving = periodicSaving === "true";
+            const isRecentRetirement = recentRetirement === "true";
+            
+            const balance_aux2 = Number(balance_aux);
+            const savingYears_aux = Number(savingYears);
+            const loanAmount_aux = Number(loanAmount);
+
+            console.log(typeof balance_aux2);
+            console.log(typeof savingYears_aux);
+            console.log(typeof loanAmount_aux);
+            console.log(typeof isConsistentSaving);
+            console.log(typeof isPeriodicSaving);
+            console.log(typeof isRecentRetirement);
+            console.log(typeof loan.id);
+
+            const savingCapacity = await loanService.savingCapacity(balance_aux2, loan.id, isConsistentSaving, isPeriodicSaving, isRecentRetirement, savingYears_aux, loanAmount_aux);
+            
+            console.log("Cargo todo");
+        
+            // Condicionales basadas en los resultados
+            if (
+                incomeQuota.data &&
+                debtBalance.data &&
+                maxCapital.data &&
+                savingCapacity.data == 1 &&
+                ageLimit &&
+                creditHistory == 1 &&
+                workEstability == 1
+            ) {
+                console.log("Se cumplen las condiciones");
+                let newState = 4;
+                setState(newState);
+                await loanService.updateState(loan, newState);
+            } else if (
+                incomeQuota.data &&
+                debtBalance.data &&
+                maxCapital.data &&
+                savingCapacity.data == 2 &&
+                ageLimit &&
+                creditHistory == 1 &&
+                workEstability == 1
+            ) {
+                console.log("Se cumplen parcialmente las condiciones");
+                let newState = 2;
+                setState(newState);
+                await loanService.updateState(loan, newState);
+            } else {
+                console.log("No se cumplen las condiciones");
+                let newState = 7;
+                setState(newState);
+                await loanService.updateState(loan, newState);
+            }
+            alert("Evaluación realizada con éxito. Revisa el estado de la solicitud en la página.");
         }
     };
     
@@ -187,6 +204,7 @@ const CreditEvaluation = () => {
         console.log("luego del set");
         await loanService.updateState(loan, newState);
         console.log("luego del update");
+        alert("Confirmacion de firma actualizada. Revisa el estado de la solicitud en la página.");
     };
 
     return (

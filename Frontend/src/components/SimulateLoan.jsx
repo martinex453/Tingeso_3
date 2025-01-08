@@ -56,7 +56,6 @@ const SimulateLoan = () => {
             alert("Todos los campos son obligatorios.");
             return;
         }
-
         switch (loantype) {
             case "1":
                 if (interest < 3.5 || interest > 5) {
@@ -92,13 +91,41 @@ const SimulateLoan = () => {
                 break;
         }
 
-        userService.simulate(unformattedCapital, term, interest)
+        let loanTypeName = "";
+        console.log(loantype);
+        switch (loantype) {
+            case "1":
+                loanTypeName = "Primera vivienda"; 
+                break; // Se agregó el break aquí
+            case "2":   
+                loanTypeName = "Segunda vivienda";
+                break; // Se agregó el break aquí
+            case "3":
+                loanTypeName = "Propiedades comerciales";
+                break; // Se agregó el break aquí
+            case "4":
+                loanTypeName = "Remodelación";
+                break; // Se agregó el break aquí
+        }
+        
+
+        const simulateMessage = `¿Está seguro de que desea simular el crédito con los siguientes datos?
+        \n\nCapital: ${unformattedCapital}\nPlazo: ${term} años\nInterés: ${interest}%\nTipo de crédito: ${loanTypeName}`;
+
+        if(window.confirm(simulateMessage)){
+            userService.simulate(unformattedCapital, term, interest)
             .then(response => {
-                setResult(response.data);
+                setResult(Math.round(response.data));
+                alert("Simulación realizada con éxito. Revisa el resultado en la parte inferior de la página.");
             })
             .catch(e => {
+                alert("Error al simular el crédito", e);
                 console.log("Error al simular el crédito", e);
             });
+        }
+        else{
+            console.log("Simulación cancelada");
+        }   
     };
 
     const handleCapitalChange = (e) => {
@@ -185,7 +212,6 @@ const SimulateLoan = () => {
                         <MenuItem value="2">Segunda vivienda</MenuItem>
                         <MenuItem value="3">Propiedades comerciales</MenuItem>
                         <MenuItem value="4">Remodelación</MenuItem>
-                        <MenuItem value="5">Tienda comercial</MenuItem>
                     </Select>
                 </FormControl>
                 <br />

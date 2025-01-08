@@ -21,21 +21,21 @@ services:
   backend1:
     image: martinex453/backend-martin-gamboa:latest
     environment:
-      - DB_HOST=192.168.56.1
+      - DB_HOST=4.228.225.18
     networks:
       - backend-network
   
   backend2:
     image: martinex453/backend-martin-gamboa:latest
     environment:
-      - DB_HOST=192.168.56.1
+      - DB_HOST=4.228.225.18
     networks:
       - backend-network
 
   backend3:
     image: martinex453/backend-martin-gamboa:latest
     environment:
-      - DB_HOST=192.168.56.1
+      - DB_HOST=4.228.225.18
     networks:
       - backend-network
   
