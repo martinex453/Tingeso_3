@@ -4,11 +4,8 @@ import userService from "../services/loan.service";
 
 const SimulateLoan = () => {
     const [capital, setCapital] = useState("");
-    const [tempCapital, setTempCapital] = useState("");
     const [term, setTerm] = useState("");
-    const [tempTerm, setTempTerm] = useState("");
     const [interest, setInterest] = useState("");
-    const [tempInterest, setTempInterest] = useState("");
     const [result, setResult] = useState(null);
     const [loantype, setloantype] = useState("1");
     const [interestRange, setInterestRange] = useState("3.5 - 5");
@@ -39,23 +36,20 @@ const SimulateLoan = () => {
         return number.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     };
 
-    const removeNumberFormat = (formattedNumber) => 
+    const removeNumberFormat = (formattedNumber) =>
         formattedNumber.replace(/\D/g, ""); // Eliminar todo lo que no sea un dígito
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Actualizamos los valores de capital, term e interest con los valores temporales
-        setCapital(tempCapital);
-        setTerm(tempTerm);
-        setInterest(tempInterest);
+        const unformattedCapital = removeNumberFormat(capital);
 
-        const unformattedCapital = removeNumberFormat(tempCapital);
-
-        if (!unformattedCapital || !term || !interest) {
+        if (!unformattedCapital || !term || !interest || !loantype) {
             alert("Todos los campos son obligatorios.");
             return;
         }
+
+        // Validaciones de interés según el tipo de crédito
         switch (loantype) {
             case "1":
                 if (interest < 3.5 || interest > 5) {
@@ -91,74 +85,57 @@ const SimulateLoan = () => {
                 break;
         }
 
-        let loanTypeName = "";
-        console.log(loantype);
-        switch (loantype) {
-            case "1":
-                loanTypeName = "Primera vivienda"; 
-                break; // Se agregó el break aquí
-            case "2":   
-                loanTypeName = "Segunda vivienda";
-                break; // Se agregó el break aquí
-            case "3":
-                loanTypeName = "Propiedades comerciales";
-                break; // Se agregó el break aquí
-            case "4":
-                loanTypeName = "Remodelación";
-                break; // Se agregó el break aquí
-        }
-        
+        const loanTypeNameMap = {
+            "1": "Primera vivienda",
+            "2": "Segunda vivienda",
+            "3": "Propiedades comerciales",
+            "4": "Remodelación",
+        };
 
         const simulateMessage = `¿Está seguro de que desea simular el crédito con los siguientes datos?
-        \n\nCapital: ${unformattedCapital}\nPlazo: ${term} años\nInterés: ${interest}%\nTipo de crédito: ${loanTypeName}`;
+        \n\nCapital: ${unformattedCapital}\nPlazo: ${term} años\nInterés: ${interest}%\nTipo de crédito: ${loanTypeNameMap[loantype]}`;
 
-        if(window.confirm(simulateMessage)){
-            userService.simulate(unformattedCapital, term, interest)
-            .then(response => {
-                setResult(Math.round(response.data));
-                alert("Simulación realizada con éxito. Revisa el resultado en la parte inferior de la página.");
-            })
-            .catch(e => {
-                alert("Error al simular el crédito", e);
-                console.log("Error al simular el crédito", e);
-            });
-        }
-        else{
+        if (window.confirm(simulateMessage)) {
+            userService
+                .simulate(unformattedCapital, term, interest)
+                .then((response) => {
+                    setResult(Math.round(response.data));
+                    alert("Simulación realizada con éxito. Revisa el resultado en la parte inferior de la página.");
+                })
+                .catch((e) => {
+                    alert("Error al simular el crédito", e);
+                    console.log("Error al simular el crédito", e);
+                });
+        } else {
             console.log("Simulación cancelada");
-        }   
+        }
     };
 
     const handleCapitalChange = (e) => {
-        let value = e.target.value.replace(/\./g, ''); // Remover el separador de miles
+        let value = e.target.value.replace(/\./g, ""); // Remover el separador de miles
         if (/^\d+$/.test(value) || value === "") {
-            setTempCapital(formatNumberWithCommas(value));
+            setCapital(formatNumberWithCommas(value));
         }
     };
 
     const handleTermChange = (e) => {
         let value = e.target.value;
-    
-        // Aceptar solo números enteros positivos
-        if (/^\d+$/.test(value) || value === "") { 
-            setTempTerm(value); // Mantener el valor sin modificaciones
+
+        if (/^\d+$/.test(value) || value === "") {
+            setTerm(value);
         }
     };
-    
-    
 
     const handleInterestChange = (e) => {
         const value = e.target.value;
-    
-        // Validar que el valor no sea negativo, pero permitir decimales
-        if (/^(?!-)\d*\.?\d+$/.test(value) || value === "") { 
-            setTempInterest(value);
+
+        if (/^(?!-)\d*\.?\d+$/.test(value) || value === "") {
+            setInterest(value);
         }
     };
-    
 
-    // Función para darle formato con separador de miles al resultado
     const formatResultWithCommas = (number) => {
-        return number.toLocaleString(); // Usa el método toLocaleString para formatear el número con miles
+        return number.toLocaleString();
     };
 
     return (
@@ -177,7 +154,7 @@ const SimulateLoan = () => {
                     <TextField
                         id="capital"
                         label="Capital a solicitar"
-                        value={tempCapital} // Usamos tempCapital aquí
+                        value={capital} // Usamos tempCapital aquí
                         onChange={handleCapitalChange}
                         InputProps={{
                             inputMode: 'numeric',
@@ -191,7 +168,7 @@ const SimulateLoan = () => {
                         id="term"
                         label="Plazo en años"
                         type="number"
-                        value={tempTerm} // Usamos tempTerm aquí
+                        value={term} // Usamos tempTerm aquí
                         onChange={handleTermChange}
                     />
                 </FormControl>
@@ -221,7 +198,7 @@ const SimulateLoan = () => {
                         id="interest"
                         label="Interés en porcentaje"
                         type="number"
-                        value={tempInterest} // Usamos tempInterest aquí
+                        value={interest} // Usamos tempInterest aquí
                         onChange={handleInterestChange} // Usamos la nueva función de cambio
                         helperText={`Ejemplo: 3% - Rango: ${interestRange}`}
                     />

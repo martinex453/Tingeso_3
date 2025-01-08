@@ -117,27 +117,23 @@ const ApplyForLoan = () => {
 
         switch (loantype) {
             case "1":
-                if(docIngresos === "" || docAvaluo === "" || docHistorialCrediticio === "" || docEscrituraPrimeraVivienda === ""){
-                    alert("Debe adjuntar todos los documentos requeridos, de lo contrario, la solicitud podria ser rechazada");
-                    return;
+                if(docIngresos === "" || docAvaluo === "" || docHistorialCrediticio === ""){
+                    alert("Esta enviando una solicitud sin documentos, si lo envia asi se le solicitaran posteriormente los documentos de igual manera");
                 }
                 break;
             case "2":
-                if(docIngresos === "" || docAvaluo === "" || docHistorialCrediticio === "" || docEscrituraPrimeraVivienda === "" || docEstadoFinanciero === "" || docPlanNegocios === ""){
-                    alert("Debe adjuntar todos los documentos requeridos, de lo contrario, la solicitud podria ser rechazada");
-                    return;
+                if(docIngresos === "" || docAvaluo === "" || docHistorialCrediticio === "" || docEscrituraPrimeraVivienda === ""){
+                    alert("Esta enviando una solicitud sin documentos, si lo envia asi se le solicitaran posteriormente los documentos de igual manera");
                 }
                 break;
             case "3":
-                if(docIngresos === "" || docAvaluo === "" || docHistorialCrediticio === "" || docEstadoFinanciero === "" || docPlanNegocios === ""){
-                    alert("Debe adjuntar todos los documentos requeridos, de lo contrario, la solicitud podria ser rechazada");
-                    return;
+                if(docIngresos === "" || docAvaluo === "" ||docEstadoFinanciero === "" || docPlanNegocios === ""){
+                    alert("Esta enviando una solicitud sin documentos, si lo envia asi se le solicitaran posteriormente los documentos de igual manera");
                 }
                 break;
             case "4":
-                if(docIngresos === "" || docAvaluo === "" || docHistorialCrediticio === "" || docEstadoFinanciero === "" || docPlanNegocios === "" || docPresupuestoRemodelacion === ""){
-                    alert("Debe adjuntar todos los documentos requeridos, de lo contrario, la solicitud podria ser rechazada");
-                    return;
+                if(docIngresos === "" || docAvaluo === "" || docPresupuestoRemodelacion === ""){
+                    alert("Esta enviando una solicitud sin documentos, si lo envia asi se le solicitaran posteriormente los documentos de igual manera");
                 }
                 break;
         }   
@@ -365,7 +361,7 @@ const ApplyForLoan = () => {
                         </FormControl>
                     )}
                     <br />
-                    {loantype === "1" && (
+                    {loantype === "2" && (
                         <FormControl fullWidth style={{ color: '#000000', fontSize: '25px' }}>
                             <label htmlFor="escrituraPrimeraVivienda">Escritura de primera vivienda</label>
                             <input
@@ -377,7 +373,7 @@ const ApplyForLoan = () => {
                         </FormControl>
                     )}
                     <br />
-                    {(loantype === "3" || loantype === "4") && (
+                    {(loantype === "3") && (
                         <>
                             <FormControl fullWidth style={{ color: '#000000', fontSize: '25px' }}>
                                 <label htmlFor="estadoFinanciero">Estado Financiero</label>
