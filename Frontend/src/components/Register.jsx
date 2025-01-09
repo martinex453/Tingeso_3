@@ -126,7 +126,7 @@ const Register = () => {
             <FormControl fullWidth>
                 <TextField
                     id="name"
-                    label="Name"
+                    label="Nombre"
                     type="text"
                     variant="standard"
                     value={name}
@@ -136,7 +136,7 @@ const Register = () => {
             <FormControl fullWidth>
                 <TextField
                     id="email"
-                    label="Email"
+                    label="Correo"
                     variant="standard"
                     type="email"
                     value={email}
@@ -146,7 +146,7 @@ const Register = () => {
             <FormControl fullWidth>
                 <TextField
                     id="password"
-                    label="Password"
+                    label="Contraseña"
                     type="password"
                     variant="standard"
                     value={password}
@@ -170,7 +170,7 @@ const Register = () => {
             <FormControl fullWidth>
                 <TextField
                     id="phone"
-                    label="Phone"
+                    label="Telefono"
                     type="tel"
                     variant="standard"
                     value={phone}
@@ -181,7 +181,7 @@ const Register = () => {
             <FormControl fullWidth>
                 <TextField
                     id="address"
-                    label="Address"
+                    label="Direccion"
                     variant="standard"
                     type="text"
                     value={address}

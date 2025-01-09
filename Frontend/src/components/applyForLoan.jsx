@@ -23,6 +23,8 @@ const ApplyForLoan = () => {
     const [rut, setRut] = useState("");
     const [propCost, setPropCost] = useState("");
     const [interestRange, setInterestRange] = useState("3.5 - 5");
+    const [infLimit, setInfLimit] = useState("");
+    const [supLimit, setSupLimit] = useState("");
     const navigate = useNavigate();
 
     const formatRut = (rut) => {
@@ -83,21 +85,33 @@ const ApplyForLoan = () => {
         switch (type) {
             case "1":
                 setInterestRange("3.5 - 5");
+                setInfLimit(3.5);
+                setSupLimit(5);
                 break;
             case "2":
                 setInterestRange("4 - 6");
+                setInfLimit(4);
+                setSupLimit(6);
                 break;
             case "3":
                 setInterestRange("5 - 7");
+                setInfLimit(5);
+                setSupLimit(7);
                 break;
             case "4":
                 setInterestRange("4.5 - 6");
+                setInfLimit(4.5);
+                setSupLimit(6);
                 break;
             case "5":
                 setInterestRange("6 - 8");
+                setInfLimit(6);
+                setSupLimit(8);
                 break;
             default:
                 setInterestRange("3.5 - 5");
+                setInfLimit(3.5);
+                setSupLimit(5);
         }
     };
 
@@ -112,6 +126,11 @@ const ApplyForLoan = () => {
         console.log(unformattedRut);
         if (!unformattedCapital || !term || !loantype || !interest || !unformattedPropCost || !unformattedRut) {
             alert("Rellene todos los campos");
+            return;
+        }
+
+        if(interest < infLimit || interest > supLimit){
+            alert("El interés debe estar entre " + infLimit + " y " + supLimit);
             return;
         }
 

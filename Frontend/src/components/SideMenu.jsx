@@ -40,7 +40,7 @@ export default function Sidemenu({ open, toggleDrawer }) {
           <ListItemIcon>
             <HomeIcon />
           </ListItemIcon>
-          <ListItemText primary="Home" />
+          <ListItemText primary="Inicio" />
         </ListItemButton>
 
         <Divider />

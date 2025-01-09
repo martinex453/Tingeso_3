@@ -210,7 +210,7 @@ const CreditEvaluation = () => {
     return (
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" component="form">
             <div style={{ backgroundColor: '#e3f2fd', width: '100%', borderRadius: '20px', marginBottom: '5vh', color: '#1a1a1a'}}>
-                <h1>Credit Evaluation</h1>
+                <h1>Evaluacion de credito</h1>
             </div>
             <Box>
                 <Box style={{ display: state === 1 ? 'block' : 'none' }}>

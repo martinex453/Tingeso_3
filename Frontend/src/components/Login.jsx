@@ -60,7 +60,7 @@ const Login = () => {
             <FormControl fullWidth>
                 <TextField
                     id="email"
-                    label="Email"
+                    label="Correo"
                     type="email"
                     variant="standard"
                     value={email}
@@ -72,7 +72,7 @@ const Login = () => {
             <FormControl fullWidth>
                 <TextField
                     id="password"
-                    label="Password"
+                    label="Contraseña"
                     variant="standard"
                     type="password"
                     value={password}
@@ -95,10 +95,10 @@ const Login = () => {
                 }}
                 onClick={(e) => userLog(e)}
             >
-                Login
+                Iniciar sesion
             </Button>
             <br/>
-            <Link to="/" style={{ color: '#646cff' }}>Register</Link>
+            <Link to="/" style={{ color: '#646cff' }}>Registrarse</Link>
         </Box>
     );
     
